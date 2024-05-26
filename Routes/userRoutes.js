@@ -2,10 +2,15 @@ const express = require('express');
 const router = express.Router();
 const User = require("../models/user");
 const {jwtMiddleware,gToken} = require('../jwt')
+
+
 router.post('/signup', async (req, res) =>{
     try{
         const data = req.body // Assuming the request body contains the User data
-
+        const adminUser = await User.findOne({ role: 'admin' });
+        if (data.role === 'admin' && adminUser) {
+            return res.status(400).json({ error: 'Admin user already exists' });
+        }
         // Create a new User document using the Mongoose model
         const newUser = new User(data);
 
